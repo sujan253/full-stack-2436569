@@ -1,6 +1,5 @@
 <?php
 // TwigHelper.php
-// Twig template engine wrapper
 // Run "composer install" on MI-Linux to install Twig before this works
 // Sujan - 5CS045
 
