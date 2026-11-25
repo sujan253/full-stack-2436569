@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_regenerate_id(true);
             $_SESSION['user_id']   = $user['id'];
             $_SESSION['username']  = $user['username'];
-            // clear captcha from session
+        
             unset($_SESSION['captcha_a'], $_SESSION['captcha_b']);
             setFlash('success', 'Welcome back, ' . $user['username'] . '!');
             header('Location: index.php');
