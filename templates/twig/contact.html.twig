@@ -1,0 +1,29 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="form-header">
+        <a href="{{ url('index.php') }}" class="back-link">&larr; Back</a>
+        <h1>CONTACT</h1>
+        <p>Get in touch with any questions or feedback.</p>
+    </div>
+    <div class="contact-card">
+        <div class="contact-row">
+            <span>📧</span>
+            <div>
+                <strong>Email</strong>
+                <p>sujan@student.wlv.ac.uk</p>
+            </div>
+        </div>
+        <div class="contact-row">
+            <span>🏫</span>
+            <div>
+                <strong>University of Wolverhampton</strong>
+                <p>5CS045 Web Development Assessment</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

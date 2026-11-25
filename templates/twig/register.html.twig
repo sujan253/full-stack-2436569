@@ -1,0 +1,57 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-box">
+        <h1 class="auth-title">REGISTER</h1>
+        <p class="auth-sub">Create an account to manage your game library.</p>
+
+        {% if error %}
+            <div class="flash flash-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url('register.php') }}" class="auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-input"
+                       value="{{ old_username }}" required maxlength="50" autocomplete="username">
+                <small>3-50 characters, letters and numbers only</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email (optional)</label>
+                <input type="email" id="email" name="email" class="form-input"
+                       value="{{ old_email }}" maxlength="100" autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-input"
+                       required minlength="6" maxlength="100" autocomplete="new-password">
+                <small>Minimum 6 characters</small>
+            </div>
+
+            <div class="form-group">
+                <label for="password2">Confirm Password</label>
+                <input type="password" id="password2" name="password2" class="form-input"
+                       required maxlength="100" autocomplete="new-password">
+            </div>
+
+            {# captcha #}
+            <div class="form-group">
+                <label for="captcha">Security Check: What is {{ captcha_a }} + {{ captcha_b }}?</label>
+                <input type="number" id="captcha" name="captcha" class="form-input"
+                       required placeholder="Enter the answer" autocomplete="off">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">CREATE ACCOUNT</button>
+        </form>
+
+        <p class="auth-link">Already have an account? <a href="{{ url('login.php') }}">Login here</a></p>
+    </div>
+</div>
+{% endblock %}

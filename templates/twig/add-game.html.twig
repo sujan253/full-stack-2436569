@@ -1,0 +1,110 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ edit_mode ? 'Edit: ' ~ game.title : 'Add Game' }}{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="form-header">
+        <a href="{{ url('index.php') }}" class="back-link">&larr; Back</a>
+        <h1>{{ edit_mode ? 'EDIT GAME' : 'ADD GAME' }}</h1>
+        <p>{{ edit_mode ? 'Update the details below.' : 'Fill in the details to add a new game.' }}</p>
+    </div>
+
+    {% if errors %}
+        <div class="flash flash-error">
+            <strong>Please fix these errors:</strong>
+            <ul>
+                {% for err in errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url('add-game.php') }}" class="game-form" id="gameForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        {% if edit_mode %}
+            <input type="hidden" name="id" value="{{ game.id }}">
+        {% endif %}
+
+        <div class="form-grid">
+
+            <div class="form-group span-2">
+                <label for="title">Game Title <span class="req">*</span></label>
+                <input type="text" id="title" name="title" class="form-input"
+                       value="{{ game.title ?? '' }}" required maxlength="255"
+                       placeholder="e.g. The Witcher 3" autocomplete="off">
+                {# autocomplete dropdown injected by JS here #}
+                <div id="title-ac" class="ac-drop"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="genre">Genre <span class="req">*</span></label>
+                <input type="text" id="genre" name="genre" class="form-input"
+                       value="{{ game.genre ?? '' }}" required maxlength="100"
+                       placeholder="e.g. RPG, Action" autocomplete="off">
+                <div id="genre-ac" class="ac-drop"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="platform">Platform <span class="req">*</span></label>
+                <input type="text" id="platform" name="platform" class="form-input"
+                       value="{{ game.platform ?? '' }}" required maxlength="100"
+                       placeholder="e.g. PC, PS5">
+            </div>
+
+            <div class="form-group">
+                <label for="developer">Developer <span class="req">*</span></label>
+                <input type="text" id="developer" name="developer" class="form-input"
+                       value="{{ game.developer ?? '' }}" required maxlength="255"
+                       placeholder="e.g. Rockstar Games" autocomplete="off">
+                <div id="dev-ac" class="ac-drop"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="publisher">Publisher</label>
+                <input type="text" id="publisher" name="publisher" class="form-input"
+                       value="{{ game.publisher ?? '' }}" maxlength="255" placeholder="e.g. Bandai Namco">
+            </div>
+
+            <div class="form-group">
+                <label for="release_year">Release Year <span class="req">*</span></label>
+                <input type="number" id="release_year" name="release_year" class="form-input"
+                       value="{{ game.release_year ?? '' }}" required min="1970" max="2027"
+                       placeholder="e.g. 2023">
+            </div>
+
+            <div class="form-group">
+                <label for="rating">Rating (0-10)</label>
+                <div class="slider-group">
+                    <input type="range" id="rating_slider" min="0" max="10" step="0.1"
+                           value="{{ game.rating ?? 7 }}" class="slider">
+                    <input type="number" id="rating" name="rating" class="form-input small"
+                           value="{{ game.rating ?? '' }}" min="0" max="10" step="0.1" placeholder="7.5">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="image_url">Image URL (optional)</label>
+                <input type="url" id="image_url" name="image_url" class="form-input"
+                       value="{{ game.image_url ?? '' }}" placeholder="https://...">
+            </div>
+
+            <div class="form-group span-2">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" class="form-textarea"
+                          rows="4" maxlength="2000" placeholder="Short description of the game...">{{ game.description ?? '' }}</textarea>
+                <small><span id="desc-count">0</span>/2000 characters</small>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url('index.php') }}" class="btn btn-ghost">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                {{ edit_mode ? 'Save Changes' : '+ Add to Vault' }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

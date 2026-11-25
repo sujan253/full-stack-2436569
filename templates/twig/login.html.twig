@@ -1,0 +1,43 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-box">
+        <h1 class="auth-title">LOGIN</h1>
+        <p class="auth-sub">Sign in to add, edit and delete games.</p>
+
+        {% if error %}
+            <div class="flash flash-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="{{ url('login.php') }}" class="auth-form" id="loginForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-input"
+                       value="{{ old_username }}" required maxlength="50" autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-input"
+                       required maxlength="100" autocomplete="current-password">
+            </div>
+
+            {# Simple math captcha - stops bots #}
+            <div class="form-group">
+                <label for="captcha">Security Check: What is {{ captcha_a }} + {{ captcha_b }}?</label>
+                <input type="number" id="captcha" name="captcha" class="form-input"
+                       required placeholder="Enter the answer" autocomplete="off">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">LOGIN</button>
+        </form>
+
+        <p class="auth-link">Don't have an account? <a href="{{ url('register.php') }}">Register here</a></p>
+    </div>
+</div>
+{% endblock %}

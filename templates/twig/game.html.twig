@@ -1,0 +1,102 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ game.title }}{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+
+    <div class="detail-nav">
+        <a href="{{ url('index.php') }}" class="back-link">&larr; Back to Library</a>
+        {% if is_logged_in %}
+        <div class="detail-actions">
+            <a href="{{ url('add-game.php', {edit: game.id}) }}" class="btn btn-outline">Edit</a>
+            <button onclick="confirmDelete({{ game.id }}, '{{ game.title|e('js') }}')" class="btn btn-danger">Delete</button>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="detail-content">
+        <div class="detail-img">
+            {% if game.image_url %}
+                <img src="{{ game.image_url }}" alt="{{ game.title }} cover"
+                     onerror="this.style.display='none'; document.getElementById('img-placeholder').style.display='flex'">
+            {% endif %}
+            <div id="img-placeholder" class="img-ph" {{ game.image_url ? 'style="display:none"' : '' }}>🎮</div>
+            {% if game.rating %}
+            <div class="detail-rating-badge">
+                <span class="big-r">{{ game.rating }}</span>
+                <span>/10</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="detail-info">
+            <div class="detail-genre">{{ game.genre }}</div>
+            <h1 class="detail-title">{{ game.title }}</h1>
+
+            <dl class="detail-list">
+                <div class="dl-row">
+                    <dt>Developer</dt>
+                    <dd>{{ game.developer }}</dd>
+                </div>
+                {% if game.publisher %}
+                <div class="dl-row">
+                    <dt>Publisher</dt>
+                    <dd>{{ game.publisher }}</dd>
+                </div>
+                {% endif %}
+                <div class="dl-row">
+                    <dt>Year</dt>
+                    <dd>{{ game.release_year }}</dd>
+                </div>
+                <div class="dl-row">
+                    <dt>Platform</dt>
+                    <dd>{{ game.platform }}</dd>
+                </div>
+                {% if game.rating %}
+                <div class="dl-row">
+                    <dt>Rating</dt>
+                    <dd>
+                        <div class="rating-bar-wrap">
+                            <div class="rating-bar" style="width: {{ (game.rating / 10 * 100)|round }}%"></div>
+                        </div>
+                        {{ game.rating }}/10
+                    </dd>
+                </div>
+                {% endif %}
+            </dl>
+
+            {% if game.description %}
+            <div class="detail-desc">
+                <h3>About</h3>
+                <p>{{ game.description|nl2br }}</p>
+            </div>
+            {% endif %}
+
+            <div class="detail-meta">
+                <small>Added: {{ game.created_at|date('j M Y') }}</small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# delete modal #}
+{% if is_logged_in %}
+<div class="modal-bg" id="delModal" style="display:none">
+    <div class="modal">
+        <h3>Delete Game?</h3>
+        <p>Delete <strong id="delTitle"></strong>? This cannot be undone.</p>
+        <div class="modal-btns">
+            <button onclick="closeModal()" class="btn btn-ghost">Cancel</button>
+            <form method="POST" action="{{ url('delete-game.php') }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="id" id="delId">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

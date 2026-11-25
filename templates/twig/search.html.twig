@@ -1,0 +1,143 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <div class="page-header">
+        <h1>SEARCH <span class="accent">LIBRARY</span></h1>
+        <p>Search by title, genre, platform, developer and more.</p>
+    </div>
+
+    <form method="GET" action="{{ url('search.php') }}" class="search-form" id="searchForm">
+
+        <div class="search-bar-wrap">
+            <input type="text" name="q" id="mainSearch" class="search-bar"
+                   value="{{ q }}" placeholder="Search by title, developer, description..."
+                   autocomplete="off">
+            <div id="search-ac" class="ac-drop"></div>
+            <button type="submit" class="search-btn">SEARCH</button>
+        </div>
+
+        <details class="adv-filters" {{ (genre or platform or developer or year_from or year_to or rating_min) ? 'open' : '' }}>
+            <summary>Advanced Filters ▾</summary>
+            <div class="filters-grid">
+
+                <div class="filter-group">
+                    <label>Genre</label>
+                    <select name="genre" class="form-input">
+                        <option value="">Any genre</option>
+                        {% for g in all_genres %}
+                            <option value="{{ g }}" {{ genre == g ? 'selected' : '' }}>{{ g }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Platform</label>
+                    <input type="text" name="platform" class="form-input"
+                           value="{{ platform }}" placeholder="Any platform">
+                </div>
+
+                <div class="filter-group">
+                    <label>Developer</label>
+                    <input type="text" name="developer" class="form-input"
+                           value="{{ developer }}" placeholder="Any developer">
+                </div>
+
+                <div class="filter-group">
+                    <label>Year (from - to)</label>
+                    <div class="range-wrap">
+                        <input type="number" name="year_from" class="form-input"
+                               value="{{ year_from }}" placeholder="From" min="1970" max="2027">
+                        <span>-</span>
+                        <input type="number" name="year_to" class="form-input"
+                               value="{{ year_to }}" placeholder="To" min="1970" max="2027">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Min Rating</label>
+                    <input type="number" name="rating_min" class="form-input"
+                           value="{{ rating_min }}" placeholder="e.g. 8.0" min="0" max="10" step="0.1">
+                </div>
+
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select name="sort" class="form-input">
+                        <option value="release_year" {{ sort == 'release_year' ? 'selected' : '' }}>Year</option>
+                        <option value="title" {{ sort == 'title' ? 'selected' : '' }}>Title</option>
+                        <option value="rating" {{ sort == 'rating' ? 'selected' : '' }}>Rating</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Order</label>
+                    <select name="dir" class="form-input">
+                        <option value="DESC" {{ dir == 'DESC' ? 'selected' : '' }}>Descending</option>
+                        <option value="ASC" {{ dir == 'ASC' ? 'selected' : '' }}>Ascending</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="filter-actions">
+                <a href="{{ url('search.php') }}" class="btn btn-ghost btn-sm">Clear All</a>
+                <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+            </div>
+        </details>
+
+    </form>
+
+    {% if searched %}
+        <div class="results-section">
+            <p class="results-info">
+                Found <strong>{{ results|length }}</strong> result{{ results|length != 1 ? 's' : '' }}
+                {% if q %} for "<strong>{{ q }}</strong>"{% endif %}
+            </p>
+
+            {% if results is empty %}
+                <div class="empty">
+                    <div class="empty-icon">🔍</div>
+                    <h3>Nothing found</h3>
+                    <p>Try changing your search terms. {% if is_logged_in %}<a href="{{ url('add-game.php') }}">Add this game?</a>{% endif %}</p>
+                </div>
+            {% else %}
+                <div class="results-list">
+                    {% for game in results %}
+                    <div class="result-row">
+                        <div class="result-info">
+                            <a href="{{ url('game.php', {id: game.id}) }}" class="result-title">{{ game.title }}</a>
+                            <div class="result-meta">
+                                <span class="gtag">{{ game.genre }}</span>
+                                <span>{{ game.release_year }}</span>
+                                <span>{{ game.platform }}</span>
+                                <span>{{ game.developer }}</span>
+                            </div>
+                        </div>
+                        {% if game.rating %}
+                            <div class="result-rating">{{ game.rating }}</div>
+                        {% endif %}
+                        <div class="result-actions">
+                            <a href="{{ url('game.php', {id: game.id}) }}" class="btn btn-sm btn-ghost">View</a>
+                            {% if is_logged_in %}
+                                <a href="{{ url('add-game.php', {edit: game.id}) }}" class="btn btn-sm btn-outline">Edit</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="search-hint">
+            <p>Enter a search term above, or browse by genre:</p>
+            <div class="genre-filters">
+                {% for g in all_genres %}
+                    <a href="{{ url('search.php', {genre: g}) }}" class="gtag">{{ g }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

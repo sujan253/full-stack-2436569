@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Security headers via meta - also set in PHP #}
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <title>{% block title %}Gamestation{% endblock %} - Gamestation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{{ url('index.php') }}" class="nav-logo">
+            <span class="bracket">[</span>GAME<span class="accent">STATION</span><span class="bracket">]</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="{{ url('index.php') }}" class="{{ current_page == 'index.php' ? 'active' : '' }}">HOME</a></li>
+            <li><a href="{{ url('search.php') }}" class="{{ current_page == 'search.php' ? 'active' : '' }}">SEARCH</a></li>
+            {% if is_logged_in %}
+                <li><a href="{{ url('add-game.php') }}" class="{{ current_page == 'add-game.php' ? 'active' : '' }}">+ ADD GAME</a></li>
+                <li><a href="{{ url('logout.php') }}" class="nav-logout">LOGOUT</a></li>
+            {% else %}
+                <li><a href="{{ url('login.php') }}" class="nav-login {{ current_page == 'login.php' ? 'active' : '' }}">LOGIN</a></li>
+            {% endif %}
+        </ul>
+        <button class="hamburger" id="hamburger" onclick="toggleNav()">&#9776;</button>
+    </div>
+</nav>
+
+<main class="main-wrap">
+
+    {# Flash messages #}
+    {% if flash %}
+        <div class="flash flash-{{ flash.type }}" id="flashMsg">
+            {{ flash.msg }}
+            <button onclick="this.parentElement.remove()" class="flash-close">&times;</button>
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+</main>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <span><span class="bracket">[</span>GAME<span class="accent">STATION</span><span class="bracket">]</span></span>
+        <span>&copy; {{ "now"|date("Y") }} - 5CS045 Web Dev - Sujan</span>
+        <div>
+            <a href="{{ url('index.php') }}">Home</a>
+            <a href="{{ url('search.php') }}">Search</a>
+            <a href="{{ url('contact.php') }}">Contact</a>
+        </div>
+    </div>
+</footer>
+
+<script src="{{ asset('js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

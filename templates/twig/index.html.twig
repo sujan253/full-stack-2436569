@@ -1,0 +1,118 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-text">
+        <p class="eyebrow">YOUR PERSONAL LIBRARY</p>
+        <h1>Track Every<br><span class="accent">Game</span> You Play</h1>
+        <p class="hero-sub">Add, search and manage your game collection.</p>
+        <div class="hero-btns">
+            <a href="{{ url('search.php') }}" class="btn btn-primary">Search Library</a>
+            {% if is_logged_in %}
+                <a href="{{ url('add-game.php') }}" class="btn btn-outline">+ Add Game</a>
+            {% else %}
+                <a href="{{ url('login.php') }}" class="btn btn-outline">Login to Add</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-stats">
+        <div class="stat">
+            <span class="stat-n">{{ total_games }}</span>
+            <span class="stat-l">GAMES</span>
+        </div>
+        <div class="stat">
+            <span class="stat-n">{{ total_genres }}</span>
+            <span class="stat-l">GENRES</span>
+        </div>
+    </div>
+</div>
+
+<section class="games-section">
+    <div class="section-top">
+        <h2>All Games <span class="count">({{ total_games }})</span></h2>
+        {# genre filter tabs #}
+        <div class="genre-filters">
+            <a href="{{ url('index.php') }}" class="gtag {{ not active_genre ? 'active' : '' }}">ALL</a>
+            {% for g in genres %}
+                <a href="{{ url('index.php', {genre: g}) }}" class="gtag {{ active_genre == g ? 'active' : '' }}">{{ g }}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if games is empty %}
+        <div class="empty">
+            <div class="empty-icon">🎮</div>
+            <h3>No games yet</h3>
+            <p>{% if is_logged_in %}<a href="{{ url('add-game.php') }}">Add the first one!</a>{% else %}<a href="{{ url('login.php') }}">Login to add games</a>{% endif %}</p>
+        </div>
+    {% else %}
+        <div class="games-grid">
+            {% for game in games %}
+            <article class="game-card">
+                <div class="card-genre">{{ game.genre }}</div>
+                <div class="card-body">
+                    <h3 class="card-title">{{ game.title }}</h3>
+                    <div class="card-meta">
+                        <span>{{ game.release_year }}</span>
+                        <span class="pipe">|</span>
+                        <span>{{ game.platform|slice(0, 20) }}{% if game.platform|length > 20 %}...{% endif %}</span>
+                    </div>
+                    <p class="card-dev">by {{ game.developer }}</p>
+                    {% if game.rating %}
+                        <div class="card-rating">
+                            <span class="r-val">{{ game.rating }}</span><span class="r-max">/10</span>
+                        </div>
+                    {% endif %}
+                    {% if game.description %}
+                        <p class="card-desc">{{ game.description|slice(0,100) }}...</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url('game.php', {id: game.id}) }}" class="btn btn-sm btn-ghost">View</a>
+                    {% if is_logged_in %}
+                        <a href="{{ url('add-game.php', {edit: game.id}) }}" class="btn btn-sm btn-outline">Edit</a>
+                        <button class="btn btn-sm btn-danger" onclick="confirmDelete({{ game.id }}, '{{ game.title|e('js') }}')">Delete</button>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+        {# pagination #}
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if page > 1 %}
+                <a href="{{ url('index.php', {page: page - 1, genre: active_genre}) }}" class="page-btn">&larr;</a>
+            {% endif %}
+            {% for i in 1..total_pages %}
+                <a href="{{ url('index.php', {page: i, genre: active_genre}) }}" class="page-btn {{ i == page ? 'active' : '' }}">{{ i }}</a>
+            {% endfor %}
+            {% if page < total_pages %}
+                <a href="{{ url('index.php', {page: page + 1, genre: active_genre}) }}" class="page-btn">&rarr;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% endif %}
+</section>
+
+{# delete confirmation modal #}
+{% if is_logged_in %}
+<div class="modal-bg" id="delModal" style="display:none">
+    <div class="modal">
+        <h3>Delete Game?</h3>
+        <p>Are you sure you want to delete <strong id="delTitle"></strong>? This cannot be undone.</p>
+        <div class="modal-btns">
+            <button onclick="closeModal()" class="btn btn-ghost">Cancel</button>
+            <form method="POST" action="{{ url('delete-game.php') }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="id" id="delId">
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
